@@ -1,6 +1,9 @@
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
+import org.opencv.videoio.VideoCapture;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -26,5 +29,13 @@ public class ImageProcessor {
         System.arraycopy(buffer, 0, targetPixels, 0, buffer.length);
         return image;
     }
-   
+
+    public void addTemplate(){
+        Imgproc.circle(VideoCapturer.webCamImage, new org.opencv.core.Point(320, 240), 3,new Scalar(0, 255, 255), 3);
+        Imgproc.rectangle(VideoCapturer.webCamImage, new org.opencv.core.Point(200, 120), new org.opencv.core.Point(300, 220), new Scalar(0, 255, 255), 2);
+        Imgproc.rectangle(VideoCapturer.webCamImage, new org.opencv.core.Point(340, 120), new org.opencv.core.Point(440, 220), new Scalar(0, 255, 255), 2);
+        Imgproc.rectangle(VideoCapturer.webCamImage, new org.opencv.core.Point(200, 260), new org.opencv.core.Point(300, 360), new Scalar(0, 255, 255), 2);
+        Imgproc.rectangle(VideoCapturer.webCamImage, new org.opencv.core.Point(340, 260), new org.opencv.core.Point(440, 360), new Scalar(0, 255, 255), 2);
+    }
+
 }
