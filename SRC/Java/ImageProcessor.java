@@ -26,17 +26,5 @@ public class ImageProcessor {
         System.arraycopy(buffer, 0, targetPixels, 0, buffer.length);
         return image;
     }
-    public Mat detectFaces(Mat image){
-        faceDetector = new CascadeClassifier(getClass().getResource("/lbpcascade_frontalface.xml").getPath());
-        MatOfRect faceDetections = new MatOfRect();
-        faceDetector.detectMultiScale(image, faceDetections);
-
-       /* Rect[] facesArray = faceDetections.toArray();
-        for (int i = 0; i < facesArray.length; i++) {
-            Imgproc.rectangle(image, facesArray[i].tl(), facesArray[i].br(), new Scalar(0, 255, 0), 3);
-        }*/
-
-
-        return image;
-    }
+   
 }
