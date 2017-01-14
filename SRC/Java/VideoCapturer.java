@@ -27,6 +27,13 @@ public class VideoCapturer extends SwingWorker<Void, Void> {
                 MainFrame.capture.read(webCamImage);
 
                 if(!webCamImage.empty()){
+                    //webCamImage=webCamImage.inv();
+                    Core.flip(webCamImage, webCamImage, 180);
+                    Imgproc.circle(webCamImage, new org.opencv.core.Point(320, 240), 3,new Scalar(0, 255, 255), 3);
+                    Imgproc.rectangle(webCamImage, new org.opencv.core.Point(200, 120), new org.opencv.core.Point(300, 220), new Scalar(0, 255, 255), 2);
+                    Imgproc.rectangle(webCamImage, new org.opencv.core.Point(340, 120), new org.opencv.core.Point(440, 220), new Scalar(0, 255, 255), 2);
+                    Imgproc.rectangle(webCamImage, new org.opencv.core.Point(200, 260), new org.opencv.core.Point(300, 360), new Scalar(0, 255, 255), 2);
+                    Imgproc.rectangle(webCamImage, new org.opencv.core.Point(340, 260), new org.opencv.core.Point(440, 360), new Scalar(0, 255, 255), 2);
                     tempImage = imageProcessor.toBufferedImage(webCamImage);
                     ImageIcon icon = new ImageIcon(tempImage, "captured image");
                     MainFrame.videoDisplay.setIcon(icon);
