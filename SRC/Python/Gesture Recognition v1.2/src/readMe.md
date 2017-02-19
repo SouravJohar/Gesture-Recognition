@@ -22,7 +22,7 @@ Note:
 `virtualLinker.py` is a file specific to my needs, as I was using OpenCV on Windows, on a VirtualMachine on MacOS.
 This .py file has to be running on MacOS while using the Gesture Recognition application.
 Since a virtual OS has no access to the hardware attributes (brightness and volume) of the host, I had to
-write to a file in a `shared folder` from my Virtual Windoews, and `virtualLinker.py` reads this file, and applies the changes on MacOS. Hard work, I tell you.
+write to a file in a `shared folder` from my Virtual Windows, and `virtualLinker.py` reads this file, and applies the changes on MacOS. Hard work, I tell you.
 
-However, if you are using Windows normally, `nircmd` will be perfecr for you, no complications.
+However, if you are using Windows normally, `nircmd` will be perfect for you, no complications.
 
