@@ -10,6 +10,7 @@ Directions to use:
 3. Press `esc` to exit.
 
 `Click` is defined in a gif file, here: https://gfycat.com/UnderstatedCloseImpala
+Adjust volume, while `Click`ing : https://gfycat.com/WhichVainHerald
 
 Dependecies:
 1.`OpenCV`, obviously.
