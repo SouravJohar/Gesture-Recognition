@@ -9,7 +9,7 @@ Directions to use:
 2. `Click` on a button with your hand, and drag it to adjust its value.
 3. Press `esc` to exit.
 
-`Click` is defined in a gif file, in this folder.
+`Click` is defined in a gif file, here: https://gfycat.com/UnderstatedCloseImpala
 
 Dependecies:
 1.`OpenCV`, obviously.
