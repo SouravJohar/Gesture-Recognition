@@ -19,8 +19,8 @@ textTimer = 1; frameCount = 0
 goodContour = True
 
 defaultHist, palmHist = hfa.getNewObjectHist("palm")
-
 setup()
+
 cap = cv2.VideoCapture(0)
 while True:
     frameCount += 1
