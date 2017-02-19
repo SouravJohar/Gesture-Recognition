@@ -14,6 +14,7 @@ Directions to use:
 
 
 ->Adjust volume, while `Click`ing : https://gfycat.com/WhichVainHerald
+->Adjust brightness, while `Click`ing: https://gfycat.com/DearestPerfumedIlladopsis
 
 Dependecies:
 1.`OpenCV`, obviously.
