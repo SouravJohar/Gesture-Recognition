@@ -7,19 +7,26 @@ import org.opencv.videoio.Videoio;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.Point;
+import java.util.ArrayList;
 
 /**
  * Created by Aakash on 1/14/2017.
  */
 public class VideoCapturer extends SwingWorker<Void, Void> {
     public static Mat webCamImage = new Mat();
+    static Mat histogram = new Mat();
+    static boolean clicked=false;
+    static Mat toShow = new Mat();
+    static Mat toShowContour = new Mat();
+    static boolean buttonClick=false;
 
     @Override
     protected Void doInBackground() throws Exception {
 
+
         ImageProcessor imageProcessor = new ImageProcessor();
         Image tempImage;
-        Image path;
+        Image tempImage2;
         MainFrame.capture = new VideoCapture(0);
         MainFrame.capture.set(Videoio.CAP_PROP_FRAME_WIDTH, 640);
         MainFrame.capture.set(Videoio.CAP_PROP_FRAME_HEIGHT, 480);
@@ -28,13 +35,60 @@ public class VideoCapturer extends SwingWorker<Void, Void> {
                 MainFrame.capture.read(webCamImage);
 
                 if(!webCamImage.empty()){
-                    //webCamImage=webCamImage.inv();
                     Core.flip(webCamImage, webCamImage, 180);
-                    imageProcessor.addTemplate();
-                    tempImage = imageProcessor.toBufferedImage(webCamImage);
+                    Mat histoRect = webCamImage.clone();
+                    Imgproc.rectangle(histoRect, ImageProcessor.histoRect.tl(), ImageProcessor.histoRect.br(),
+                            new Scalar(0, 255, 255), 2);
+
+                    toShowContour = webCamImage.clone();
+                    toShow = histoRect;
+                    if(clicked ==true){
+                       // toShow=imageProcessor.addTemplate(webCamImage);
+                        Mat tImage = webCamImage.clone();
+                        //Imgproc.GaussianBlur(tImage, tImage, new Size(7, 7), 0);
+                        Imgproc.cvtColor(tImage,tImage, Imgproc.COLOR_BGR2HSV);
+                        ArrayList<Mat> matList = new ArrayList();
+                        matList.add(tImage);
+                        Mat probImage = new Mat();
+                        Imgproc.calcBackProject(matList, new MatOfInt(0, 1), histogram, probImage, new MatOfFloat(0, 180, 0, 256), 1);
+                        Mat ellipse = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(5, 5));
+                        Imgproc.filter2D(probImage, probImage, -1, ellipse);
+                        Imgproc.threshold(probImage, probImage, 70, 255, Imgproc.THRESH_BINARY);
+                        ArrayList<Mat> merge = new ArrayList<>();
+                        merge.add(probImage);
+                        merge.add(probImage);
+                        merge.add(probImage);
+                        Core.merge(merge, probImage);
+                        Core.bitwise_and(probImage, webCamImage, probImage);
+                        //toShow=probImage;
+                        Mat temp = new Mat();
+                        temp=probImage;
+                        toShowContour = imageProcessor.convertToBinary(temp);
+                        toShowContour = imageProcessor.findAndDrawContours(toShowContour);
+                        //Imgproc.threshold(to, converted, 70, 255, Imgproc.THRESH_BINARY + Imgproc.THRESH_OTSU);
+                        toShow = imageProcessor.addTemplate(webCamImage);
+                    }
+                    /*toShowContour=imageProcessor.convertToBinary(webCamImage);
+                    toShowContour=imageProcessor.findAndDrawContours(toShowContour);*/
+                    
+                    
+
+                    
+
+                    if(buttonClick==false){
+                    	tempImage = imageProcessor.toBufferedImage(toShow);
+                    }
+                    else{
+                    	tempImage=imageProcessor.toBufferedImage(toShow);
+                    }
+                    tempImage2 = imageProcessor.toBufferedImage(toShowContour);
                     ImageIcon icon = new ImageIcon(tempImage, "captured image");
+                    ImageIcon icon2 = new ImageIcon(tempImage2, "processed image");
                     MainFrame.videoDisplay.setIcon(icon);
-                    //mainFrame.pack();
+                    MainFrame.binary.setIcon(icon2);
+
+
+
                 }
                 else{
                     break;
