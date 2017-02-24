@@ -100,18 +100,16 @@ while True:
                         cv2.line(frame, (220, 117), (440, 117), (80, 127, 255), 2)
                         cv2.putText(frame, "Volume", (40, 175), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,165,255), 1, cv2.LINE_AA)
                         f = open(r"\\VBOXSVR\Code\HandRecData.txt", "w")
-                        if 90<indexFinger[1]<150:
-                                cv2.circle(frame, (max(220, min(indexFinger[0], 440)),117) , 20, (71, 99, 255), -1)
-                                f.write("v" + str(max(220, min(indexFinger[0], 440))))
+                        cv2.circle(frame, (max(220, min(indexFinger[0], 440)),117) , 20, (71, 99, 255), -1)
+                        f.write("v" + str(max(220, min(indexFinger[0], 440))))
 
                 if stateOne and avgClick:
                         cv2.circle(frame, (95, 117), 30, (0, 165, 255), -1)
                         cv2.line(frame, (220, 117), (440, 117), (80, 127, 255), 2)
                         cv2.putText(frame, "Brightness", (20, 175), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 165,255), 1, cv2.LINE_AA)
                         f = open(r"\\VBOXSVR\Code\HandRecData.txt", "w")
-                        if 90<indexFinger[1]<150:
-                                cv2.circle(frame, (max(220, min(indexFinger[0], 440)),117) , 20, (71, 99, 255), -1)
-                                f.write("b" + str(max(220, min(indexFinger[0], 440))))
+                        cv2.circle(frame, (max(220, min(indexFinger[0], 440)),117) , 20, (71, 99, 255), -1)
+                        f.write("b" + str(max(220, min(indexFinger[0], 440))))
 
                 if stateTwo == False and stateOne ==False and 280<indexFinger[0]<360 and 130<indexFinger[1]<210 and avgClick:
                         stateTwo = True
