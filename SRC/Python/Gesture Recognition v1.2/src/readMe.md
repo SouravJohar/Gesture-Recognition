@@ -24,7 +24,7 @@ Directions to use:
 Dependecies:
 
 
-1.`OpenCV`, obviously.
+1.`OpenCV` v3
 
 2.`pyautogui`, for mouse control using your hand. (Under development)
 
