@@ -13,6 +13,9 @@ Latest version of [JAVA](http://www.oracle.com/technetwork/java/javase/downloads
 3.     
 [PowerShell](https://github.com/PowerShell/PowerShell)
 
+4.
+[Nircmd](http://download.cnet.com/NirCmd/3000-2094_4-77191.html)
+
 **Directions****:**
 
 1.     
