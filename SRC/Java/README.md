@@ -5,7 +5,7 @@ A simple program where you can use your hand to control the volume and the brigh
 **Dependencies:**
 
 1.     
-Latest version of JAVA
+Latest version of [JAVA](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 
 2.     
 OpenCV
