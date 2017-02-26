@@ -1,6 +1,5 @@
 
 import org.opencv.core.Core;
-
 import javax.swing.*;
 
 /**
@@ -12,11 +11,11 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() { 
             @Override
             public void run() {
                 try {
-                    new MainFrame();
+                    new MainFrame();                    //Calling the GUI(MainFrame)
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 } catch (UnsupportedLookAndFeelException e) {

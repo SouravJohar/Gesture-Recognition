@@ -1,8 +1,5 @@
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
-import org.opencv.videoio.Videoio;
-
-import javax.management.remote.JMXConnectorFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -17,14 +14,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class MainFrame {
 
-    static VideoCapture capture;
-    static JLabel videoDisplay, binary;
+    static VideoCapture capture; //The capture element of OpenCv(gets the webcam Image)
+    static JLabel videoDisplay, binary;//
     JFrame mainFrame;
     JButton startVideo, stopVideo, histoCapture;
-    JPanel buttonHolder;
+    JPanel buttonHolder;//the bottom part of the GUI holding the three buttons
 
-    MainFrame() throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
-        UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+     MainFrame() throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
+        UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");//Setting the windows look and feel
         mainFrame = new JFrame("Compter Vision");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setLayout(new BorderLayout());
@@ -41,7 +38,7 @@ public class MainFrame {
         mainFrame.add(binary, BorderLayout.EAST);
         mainFrame.add(buttonHolder, BorderLayout.SOUTH);
         mainFrame.setVisible(true);
-        mainFrame.setSize(1316, 560);
+        mainFrame.setSize(1316, 560);//perfect for a 1080p screen
         mainFrame.setLocationRelativeTo(null);
 
 
@@ -53,7 +50,7 @@ public class MainFrame {
                 VideoCapturer vc = new VideoCapturer();
                 videoDisplay.setVisible(true);
                 binary.setVisible(true);
-                vc.execute();
+                vc.execute();//getting the video feed, entire thing runs in the background(multithreading)
             }
         });
 
@@ -65,7 +62,7 @@ public class MainFrame {
                 File file = new File("check.txt");                
                 try(FileWriter writer = new FileWriter(file.getAbsolutePath(), true)){
                 	String a = "blahblah";                	
-                	writer.write(a);                	               	
+                	writer.write(a);                	               	//Have to create a file called check, so that the background scripts know when to stop
                 } catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -78,8 +75,8 @@ public class MainFrame {
                 binary.setVisible(false);
                 capture.release();
                 try {
-					TimeUnit.SECONDS.sleep(1);
-					file.delete();
+					TimeUnit.SECONDS.sleep(1);//Sleeping for 1 second to ensure the scripts catch up, and terminate
+					file.delete(); //deletes the file, as it is no longer needed
 				} catch (InterruptedException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -99,8 +96,8 @@ public class MainFrame {
                 File bri = new File("BrightnessScript.ps1");
                 File vol = new File("VolumeScript.ps1");
                 try {
-					Runtime.getRuntime().exec("cmd /c powershell -noexit \"& \"\""+bri.getAbsolutePath() +"\"\"\"");
-					Runtime.getRuntime().exec("cmd /c powershell -noexit \"& \"\""+vol.getAbsolutePath() +"\"\"\"");
+					Runtime.getRuntime().exec("cmd /c powershell -noexit \"& \"\""+bri.getAbsolutePath() +"\"\"\"");//initiates the brightness script
+					Runtime.getRuntime().exec("cmd /c powershell -noexit \"& \"\""+vol.getAbsolutePath() +"\"\"\"");//initiates the volume script
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
