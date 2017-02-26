@@ -14,6 +14,9 @@ import org.opencv.videoio.Videoio;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +31,10 @@ public class ImageProcessor {
 	public static Mat clone = VideoCapturer.webCamImage.clone();
     public static Rect histoRect = new Rect(new Point(295, 215), new Point(345, 265));
     CascadeClassifier faceDetector = new CascadeClassifier("Cascades/haarcascade_frontalface_default.xml");
+    boolean fingerClicked = false;
+    Point thumb = new Point(), index = new Point();
+    static double volume, brightness;
+    
 
     public Mat drawFace(Mat image){
         MatOfRect faceRect = new MatOfRect();
@@ -90,7 +97,7 @@ public class ImageProcessor {
         return histogram;
     }
 
-    public Mat findAndDrawContours(Mat image) {
+    public Mat findAndDrawContours(Mat image) throws IOException {
         Mat temp = VideoCapturer.webCamImage.clone();
         Mat contourMat = image.clone();
         ArrayList<MatOfPoint> contours = new ArrayList<>();
@@ -125,10 +132,10 @@ public class ImageProcessor {
 
 
             Imgproc.drawContours(temp, printContour, 0, new Scalar(0, 255, 0), 2);
-            Imgproc.drawContours(temp, hullContours, 0, new Scalar(255,255,255),2);
+            //Imgproc.drawContours(temp, hullContours, 0, new Scalar(255,255,255),2);
 
 
-            Moments moments = Imgproc.moments(contourMat, true);
+            /*Moments moments = Imgproc.moments(contourMat, true);
             double cx=0;
             double cy=0;
 
@@ -137,7 +144,7 @@ public class ImageProcessor {
                 cy =  (moments.get_m01()/moments.get_m00());
 
             }
-            Point center = new Point(cx, cy);
+            Point center = new Point(cx, cy);*/
 
             MatOfInt4 hullDefects = new MatOfInt4();
 
@@ -151,11 +158,12 @@ public class ImageProcessor {
             //Point farp = new Point();
             
 
-            double miny=200;
+            double miny=300;
             double minx=600;
             int checker=1;
             double check1=0, check2=0;
-            Point thumb = new Point(), index = new Point(), prevThumb = new Point(), prevIndex = new Point();
+            double[] checkEnd=null;
+            
             for(int k=0; k<hullDefects.size().height; k++){
                 double[] sefd = hullDefects.get(k, 0);
 
@@ -166,14 +174,7 @@ public class ImageProcessor {
                 /*double[] far = currentContour.get((int) sefd[2], 0);
                 farp.set(far);*/
 
-                //double dist = Imgproc.pointPolygonTest(cnt, center, true);
-                //System.out.println(start.length);
-
-                //double minx = tempEnd[0];
-
-
-
-	                if(endp.y>400){
+                if(endp.y>350){
 	                    continue;
 	                }
                 if((k>0)){
@@ -193,24 +194,19 @@ public class ImageProcessor {
                 if(endp.x<10||endp.y<10){
                 	continue;
                 }
-                double[] checkEnd=null;
-                
+                               
                 if(checker==1){
                 	if(endp.y<miny&&endp.y!=(double)0.0&&(Math.abs(thumb.x-endp.x)>10)){
                     index.set(end);
                     
                 	}
                 check1=  index.y;
-                	
-                	if((endp.x<minx&&endp.x!=(double)0.0&&endp.y!=(double)0.0)){
-                		thumb.set(end);
-                    
-                }
+                   	if((endp.x<minx&&endp.x!=(double)0.0&&endp.y!=(double)0.0)){
+               		thumb.set(end);
+               		checkEnd=end;                    
+                   	}
+                        	
                 check2=thumb.x;
-                
-                
-                checkEnd = end;
-                
                 checker++;
                 }
                 if(checker==2){
@@ -228,21 +224,31 @@ public class ImageProcessor {
                         thumb.set(end);
                         
                     }
+                    if(Math.abs(thumb.y-end[1])>50){
+                    	thumb.set(checkEnd);
+                    	//continue;
+                    }
+                    if(Math.abs(thumb.x-end[0])>50){
+                    	thumb.set(checkEnd);
+                    }
+                                        
                     checker--;
                 }
-                
-               /* if(endp.y>thumb.y){
+                if(endp.y>thumb.y){
                 	continue;
-                }*/
+                }
+                if(endp.x>thumb.x){
+                continue;
+                }
                 
                 
                 
                 Imgproc.circle(temp, endp, 3, new Scalar(255, 0, 0), 2);
-                //Imgproc.line(temp, center, endp, new Scalar(0, 255, 255), 2);
+                
                 
 
             }
-            boolean fingerClicked = false;
+            
             
             if(thumb.x !=(double)0.0||thumb.y !=(double)0.0){
             Imgproc.putText(temp, "Thumb", thumb,
@@ -250,46 +256,69 @@ public class ImageProcessor {
             Imgproc.circle(temp, thumb, 10, new Scalar(0, 0, 0), 4);
             double a =Math.sqrt((index.x-thumb.x)*(index.x-thumb.x)+(index.y-thumb.y)*(index.y-thumb.y))/Math.abs(index.x-thumb.x);
             if(a>0)
-            System.out.println(a);
+            //System.out.println(a);
             if(a> 2.5){
             	fingerClicked=true;
             }
             else
             	fingerClicked=false;
-            System.out.println(fingerClicked);
-           // System.out.println(Math.sqrt((thumb.x-center.x)*(thumb.x-center.x)+(thumb.y-center.y)*(thumb.y-center.y)));
-            }
-           // System.out.println(thumb.x+" "+thumb.y);
+            //System.out.println(fingerClicked);
+            //System.out.println(index.x+" "+index.y);
+            }         
             
             if(index.x !=(double)0.0||index.y !=(double)0.0){
             Imgproc.putText(temp, "Index", index,
                     Core.FONT_HERSHEY_COMPLEX_SMALL, 3, new Scalar(0, 0, 0), 2);
             Imgproc.circle(temp, index, 10, new Scalar(0, 0, 0), 4);
-            //System.out.println(index.x +" "+ index.y);
+            
             }
-            Imgproc.circle(temp, center, 3, new Scalar(255, 0, 0), 2);
             
             
-            if(fingerClicked==true&&index.x<350.0&&index.x>290.0&&index.y<100.0&&index.y>30.0){
-            	VideoCapturer.buttonClick=true;
-            	Imgproc.circle(VideoCapturer.webCamImage, new org.opencv.core.Point(320, 60), 30, new Scalar(0, 255, 255), -1);
+            //double a=350.0, b=290.0, c=70.0, d=570.0, e=350.0, f=290.0;
+            if(fingerClicked==true&&index.x<470.0&&index.x>170.0&&index.y<100.0&&index.y>30.0){
+            	
+            	//Imgproc.circle(VideoCapturer.webCamImage2, new org.opencv.core.Point(320, 60), 30, new Scalar(0, 255, 255), -1);
+            	Imgproc.line(VideoCapturer.webCamImage, new org.opencv.core.Point(170, 60 ), new org.opencv.core.Point(470, 60), new Scalar(0, 255, 255), 3);
+            	Imgproc.circle(VideoCapturer.webCamImage, new org.opencv.core.Point(index.x, 60), 30, new Scalar(0, 255, 255), -1);
+            	volume = (index.x-170)*218.5;
+            	/*String command ="cmd /c nircmd.exe setvolume 0 "+a+" "+a;
+            	Runtime.getRuntime().exec(command);*/
+            	
+            	//this.addSlider1(new org.opencv.core.Point(320, 60));
+            	VideoCapturer.button1Click=true;
             }
             else{
-            	VideoCapturer.buttonClick=false;
+            	VideoCapturer.button1Click=false;
+            	
             }
-            if(fingerClicked==true&&index.x<350.0&&index.x>290.0&&index.y<180.0&&index.y>110.0){
-            	VideoCapturer.buttonClick=true;
-            	Imgproc.circle(VideoCapturer.webCamImage, new org.opencv.core.Point(320, 140), 30, new Scalar(0, 255, 255), -1);
+            
+            if(fingerClicked==true&&index.x<470.0&&index.x>170.0&&index.y<180.0&&index.y>110.0){
+            	//this.addSlider2(new org.opencv.core.Point(320, 140));
+            	Imgproc.line(VideoCapturer.webCamImage, new org.opencv.core.Point(170, 140 ), new org.opencv.core.Point(470, 140), new Scalar(0, 255, 255), 3);
+            	Imgproc.circle(VideoCapturer.webCamImage, new org.opencv.core.Point(index.x, 140), 30, new Scalar(0, 255, 255), -1);
+            	brightness = (index.x-170.0)/3;
+            	/*String command = "cmd /c nircmd.exe setbrightness "+a;
+            	Runtime.getRuntime().exec(command);*/
+            	
+            	VideoCapturer.button2Click=true;
+            	//Imgproc.circle(VideoCapturer.webCamImage2, new org.opencv.core.Point(320, 140), 30, new Scalar(0, 255, 255), -1);
             }
             else{
-            	VideoCapturer.buttonClick=false;
+            	VideoCapturer.button2Click=false;
+            	
             }
+            
 
         }
 
         return temp;
 
     }
+    
+    
+    
+    
+    
 
 
 
