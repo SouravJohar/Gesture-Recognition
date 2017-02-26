@@ -13,8 +13,8 @@ Latest version of [JAVA](http://www.oracle.com/technetwork/java/javase/downloads
 3.     
 [PowerShell](https://github.com/PowerShell/PowerShell)
 
-4.
-[Nircmd](http://download.cnet.com/NirCmd/3000-2094_4-77191.html)
+4.     
+ [Nircmd](http://download.cnet.com/NirCmd/3000-2094_4-77191.html)
 
 **Directions****:**
 
@@ -72,3 +72,6 @@ PowerShell has to be above version 2.0
 ·       
 If you are a windows user (above win 7) you don’t
 have to download PowerShell explicitly
+
+·       
+You have to place nircmd.exe outside the src folder inorder for this to work
