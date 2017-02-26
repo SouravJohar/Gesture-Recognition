@@ -7,6 +7,7 @@ import org.opencv.videoio.Videoio;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.Point;
+import java.io.FileWriter;
 import java.util.ArrayList;
 
 /**
@@ -18,14 +19,16 @@ public class VideoCapturer extends SwingWorker<Void, Void> {
     static boolean clicked=false;
     static Mat toShow = new Mat();
     static Mat toShowContour = new Mat();
-    static boolean buttonClick=false;
+    static boolean button1Click=false, button2Click=false;
+    static Mat webCamImage2, webCamImage3;
+    
 
     @Override
     protected Void doInBackground() throws Exception {
 
 
         ImageProcessor imageProcessor = new ImageProcessor();
-        Image tempImage;
+        Image tempImage = null;
         Image tempImage2;
         MainFrame.capture = new VideoCapture(0);
         MainFrame.capture.set(Videoio.CAP_PROP_FRAME_WIDTH, 640);
@@ -39,7 +42,9 @@ public class VideoCapturer extends SwingWorker<Void, Void> {
                     Mat histoRect = webCamImage.clone();
                     Imgproc.rectangle(histoRect, ImageProcessor.histoRect.tl(), ImageProcessor.histoRect.br(),
                             new Scalar(0, 255, 255), 2);
-
+                    
+                    webCamImage2=webCamImage.clone();
+                    webCamImage3=webCamImage.clone();
                     toShowContour = webCamImage.clone();
                     toShow = histoRect;
                     if(clicked ==true){
@@ -66,29 +71,44 @@ public class VideoCapturer extends SwingWorker<Void, Void> {
                         toShowContour = imageProcessor.convertToBinary(temp);
                         toShowContour = imageProcessor.findAndDrawContours(toShowContour);
                         //Imgproc.threshold(to, converted, 70, 255, Imgproc.THRESH_BINARY + Imgproc.THRESH_OTSU);
-                        toShow = imageProcessor.addTemplate(webCamImage);
+                        toShow = imageProcessor.addTemplate(webCamImage2);
                     }
                     /*toShowContour=imageProcessor.convertToBinary(webCamImage);
-                    toShowContour=imageProcessor.findAndDrawContours(toShowContour);*/
-                    
-                    
-
-                    
-
-                    if(buttonClick==false){
+                    toShowContour=imageProcessor.findAndDrawContours(toShowContour);*/                               
+                   
+                    if(button1Click==false&&button2Click==false){
                     	tempImage = imageProcessor.toBufferedImage(toShow);
                     }
                     else{
-                    	tempImage=imageProcessor.toBufferedImage(toShow);
+                    	tempImage=imageProcessor.toBufferedImage(webCamImage);
                     }
+                    
                     tempImage2 = imageProcessor.toBufferedImage(toShowContour);
                     ImageIcon icon = new ImageIcon(tempImage, "captured image");
                     ImageIcon icon2 = new ImageIcon(tempImage2, "processed image");
                     MainFrame.videoDisplay.setIcon(icon);
                     MainFrame.binary.setIcon(icon2);
-
-
-
+                    try(FileWriter writer = new FileWriter("NirBrightness.txt", true)){
+                    	String a = Double.toString(ImageProcessor.brightness);                    	
+                        //System.out.println(a);
+                    	if(!a.equals("0.0")){
+                    	writer.write(a);
+                    	writer.write(System.getProperty("line.separator"));
+                    }
+                    	
+                    }
+                    try(FileWriter writer = new FileWriter("NirVolume.txt", true)){
+                    	String a = Double.toString(ImageProcessor.volume);
+                    	//System.out.println(a);
+                    	if(!a.equals("0.0")){
+                    	writer.write(a);
+                    	writer.write(System.getProperty("line.separator"));
+                    	}
+                    	
+                    }
+                    
+                    //writer.write((int)ImageProcessor.brightness);
+                    
                 }
                 else{
                     break;
