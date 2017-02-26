@@ -7,6 +7,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Aakash on 1/14/2017.
@@ -58,12 +62,29 @@ public class MainFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 VideoCapturer.clicked = false;
+                File file = new File("check.txt");                
+                try(FileWriter writer = new FileWriter(file.getAbsolutePath(), true)){
+                	String a = "blahblah";                	
+                	writer.write(a);                	               	
+                } catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+                System.out.println(file.getAbsolutePath());
                 VideoCapturer.webCamImage=null;
                 VideoCapturer.toShow = null;
                 VideoCapturer.toShowContour = null;
                 videoDisplay.setVisible(false);
                 binary.setVisible(false);
                 capture.release();
+                try {
+					TimeUnit.SECONDS.sleep(1);
+					file.delete();
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+                //file.delete();
             }
         });
 
@@ -75,6 +96,16 @@ public class MainFrame {
                 Mat histogram = a.captureHistogram(VideoCapturer.webCamImage);
                 VideoCapturer.histogram = histogram;
                 binary.setVisible(true);
+                File bri = new File("BrightnessScript.ps1");
+                File vol = new File("VolumeScript.ps1");
+                try {
+					Runtime.getRuntime().exec("cmd /c powershell -noexit \"& \"\""+bri.getAbsolutePath() +"\"\"\"");
+					Runtime.getRuntime().exec("cmd /c powershell -noexit \"& \"\""+vol.getAbsolutePath() +"\"\"\"");
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+                
             }
         });
 
