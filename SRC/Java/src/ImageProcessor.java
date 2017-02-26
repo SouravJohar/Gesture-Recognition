@@ -1,50 +1,22 @@
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.Import;
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
 
-import javafx.scene.transform.Scale;
 import org.opencv.core.*;
 import org.opencv.core.Point;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.imgproc.Moments;
 import org.opencv.objdetect.CascadeClassifier;
-import org.opencv.video.Video;
-import org.opencv.videoio.VideoCapture;
-import org.opencv.videoio.Videoio;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.*;
 
 /**
  * Created by Aakash on 1/9/2017.
  */
 public class ImageProcessor {
-	public static Mat clone = VideoCapturer.webCamImage.clone();
     public static Rect histoRect = new Rect(new Point(295, 215), new Point(345, 265));
-    CascadeClassifier faceDetector = new CascadeClassifier("Cascades/haarcascade_frontalface_default.xml");
     boolean fingerClicked = false;
     Point thumb = new Point(), index = new Point();
     static double volume, brightness;
-    
-
-    public Mat drawFace(Mat image){
-        MatOfRect faceRect = new MatOfRect();
-        faceDetector.detectMultiScale(image, faceRect);
-        for(Rect rect : faceRect.toArray()){
-            Imgproc.rectangle(image, new Point(rect.x, rect.y), new Point(rect.x
-                    + rect.width, rect.y + rect.height), new Scalar(0, 255, 0), 2);
-        }
-        return image;
-    }
 
 
     public Image toBufferedImage(Mat matrix) {
@@ -52,7 +24,7 @@ public class ImageProcessor {
         if (matrix.channels() > 1) {
             type = BufferedImage.TYPE_3BYTE_BGR;
         }
-        int bufferSize = matrix.channels() * matrix.cols() * matrix.rows();
+        int bufferSize = matrix.channels() * matrix.cols() * matrix.rows();//a function that converts the type Mat to a buffered image
         byte[] buffer = new byte[bufferSize];
         matrix.get(0, 0, buffer); // get all the pixels
         BufferedImage image = new BufferedImage(matrix.cols(), matrix.
@@ -63,30 +35,21 @@ public class ImageProcessor {
         return image;
     }
 
-    public Mat addTemplate(Mat image) {
-        //Imgproc.circle(image, new org.opencv.core.Point(320, 240), 3, new Scalar(0, 255, 255), 3);
-    	Imgproc.circle(image, new org.opencv.core.Point(320, 60), 30, new Scalar(0, 255, 255), 2);
-    	Imgproc.circle(image, new org.opencv.core.Point(320, 140), 30, new Scalar(0, 255, 255), 2);
-        //Imgproc.rectangle(image, new org.opencv.core.Point(200, 120), new org.opencv.core.Point(300, 220), new Scalar(0, 255, 255), 2);
-        //Imgproc.rectangle(image, new org.opencv.core.Point(340, 120), new org.opencv.core.Point(440, 220), new Scalar(0, 255, 255), 2);
-        //Imgproc.rectangle(image, new org.opencv.core.Point(200, 260), new org.opencv.core.Point(300, 360), new Scalar(0, 255, 255), 2);
-       //Imgproc.rectangle(image, new org.opencv.core.Point(340, 260), new org.opencv.core.Point(440, 360), new Scalar(0, 255, 255), 2);
+    public Mat addTemplate(Mat image) {//adds the two circles when capture histogram is clicked
+       Imgproc.circle(image, new org.opencv.core.Point(320, 60), 30, new Scalar(0, 255, 255), 2);
+       Imgproc.circle(image, new org.opencv.core.Point(320, 140), 30, new Scalar(0, 255, 255), 2);       
         return image;
     }
 
-    public Mat convertToBinary(Mat image) {
+    public Mat convertToBinary(Mat image) {//converts the image to binary
         Mat converted = new Mat();
-
-        Imgproc.cvtColor(image, converted, Imgproc.COLOR_BGRA2GRAY);
-        //Imgproc.GaussianBlur(converted, converted, new Size(5, 5), 0);
-        Imgproc.medianBlur(converted, converted, 7);
-        //Imgproc.adaptiveThreshold(converted, converted, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY_INV, 15, 40);
+        Imgproc.cvtColor(image, converted, Imgproc.COLOR_BGRA2GRAY);        
+        Imgproc.medianBlur(converted, converted, 7);        
         Imgproc.threshold(converted, converted, 70, 255, Imgproc.THRESH_BINARY+Imgproc.THRESH_OTSU );
-
         return converted;
 
     }
-    Mat captureHistogram(Mat image){
+    Mat captureHistogram(Mat image){//captures the histogram
         Mat hisArea = image.submat(histoRect);
         Imgproc.cvtColor(hisArea, hisArea, Imgproc.COLOR_BGR2HSV);
         ArrayList<Mat> matList = new ArrayList<>();
@@ -97,7 +60,7 @@ public class ImageProcessor {
         return histogram;
     }
 
-    public Mat findAndDrawContours(Mat image) throws IOException {
+    public Mat findAndDrawContours(Mat image) throws IOException {//using the histogram value, this function draws a contour around the hand, then detects the thumb and index and knows when a click happens
         Mat temp = VideoCapturer.webCamImage.clone();
         Mat contourMat = image.clone();
         ArrayList<MatOfPoint> contours = new ArrayList<>();
@@ -131,49 +94,23 @@ public class ImageProcessor {
             printContour.add(currentContour);
 
 
-            Imgproc.drawContours(temp, printContour, 0, new Scalar(0, 255, 0), 2);
-            //Imgproc.drawContours(temp, hullContours, 0, new Scalar(255,255,255),2);
-
-
-            /*Moments moments = Imgproc.moments(contourMat, true);
-            double cx=0;
-            double cy=0;
-
-            if(moments.get_m00()!=0){
-                 cx =  (moments.get_m10()/moments.get_m00());
-                cy =  (moments.get_m01()/moments.get_m00());
-
-            }
-            Point center = new Point(cx, cy);*/
-
+            Imgproc.drawContours(temp, printContour, 0, new Scalar(0, 255, 0), 2);       
             MatOfInt4 hullDefects = new MatOfInt4();
-
-
             Imgproc.convexityDefects(currentContour, hull, hullDefects);
-
-
-
             Point startp = new Point();
-            Point endp = new Point();
-            //Point farp = new Point();
-            
-
+            Point endp = new Point();                  
             double miny=300;
             double minx=600;
             int checker=1;
-            double check1=0, check2=0;
+            double check1=0;
             double[] checkEnd=null;
             
             for(int k=0; k<hullDefects.size().height; k++){
                 double[] sefd = hullDefects.get(k, 0);
-
                 double[] start = currentContour.get((int) sefd[0], 0);
                 startp.set(start);
                 double[] end = currentContour.get((int) sefd[1], 0);
-                endp.set(end);
-                /*double[] far = currentContour.get((int) sefd[2], 0);
-                farp.set(far);*/
-
+                endp.set(end);                
                 if(endp.y>350){
 	                    continue;
 	                }
@@ -181,8 +118,6 @@ public class ImageProcessor {
 
                     double[] tempsefd = hullDefects.get(k-1, 0);
                     double[] tempEnd = currentContour.get((int) tempsefd[1], 0);
-
-
                     if((Math.abs((tempEnd[0] - end[0])) < 15)||(Math.abs(tempEnd[1] - end[1]) < 15)){
                         continue;
                     }
@@ -195,7 +130,7 @@ public class ImageProcessor {
                 	continue;
                 }
                                
-                if(checker==1){
+                if(checker==1){//the checker variable is used to improve the accuracy of the finger detection, it keeps track of the current and previous values
                 	if(endp.y<miny&&endp.y!=(double)0.0&&(Math.abs(thumb.x-endp.x)>10)){
                     index.set(end);
                     
@@ -206,7 +141,6 @@ public class ImageProcessor {
                		checkEnd=end;                    
                    	}
                         	
-                check2=thumb.x;
                 checker++;
                 }
                 if(checker==2){
@@ -214,7 +148,7 @@ public class ImageProcessor {
                         index.set(end);
                         
                     }
-                	double xi=index.x, yi=index.y;
+                	double xi=index.x;
                     if(Math.abs(index.y-check1)>50)
                     {	end[0]=xi;
                     	end[1]=check1;
@@ -243,7 +177,7 @@ public class ImageProcessor {
                 
                 
                 
-                Imgproc.circle(temp, endp, 3, new Scalar(255, 0, 0), 2);
+                Imgproc.circle(temp, endp, 3, new Scalar(255, 0, 0), 2);//drawing the points(thumb and index)
                 
                 
 
@@ -251,40 +185,36 @@ public class ImageProcessor {
             
             
             if(thumb.x !=(double)0.0||thumb.y !=(double)0.0){
-            Imgproc.putText(temp, "Thumb", thumb,
-                    Core.FONT_HERSHEY_COMPLEX_SMALL, 3, new Scalar(0, 0, 0), 2);
+            Imgproc.putText(temp, "Thumb", thumb,Core.FONT_HERSHEY_COMPLEX_SMALL, 3, new Scalar(0, 0, 0), 2);//indicating thumb
             Imgproc.circle(temp, thumb, 10, new Scalar(0, 0, 0), 4);
-            double a =Math.sqrt((index.x-thumb.x)*(index.x-thumb.x)+(index.y-thumb.y)*(index.y-thumb.y))/Math.abs(index.x-thumb.x);
+            double a =Math.sqrt((index.x-thumb.x)*(index.x-thumb.x)+(index.y-thumb.y)*(index.y-thumb.y))/Math.abs(index.x-thumb.x);//a ratio that is used to figure out if the finger is clicked on not
             if(a>0)
-            //System.out.println(a);
+          
             if(a> 2.5){
             	fingerClicked=true;
             }
             else
             	fingerClicked=false;
-            //System.out.println(fingerClicked);
-            //System.out.println(index.x+" "+index.y);
+            
             }         
             
             if(index.x !=(double)0.0||index.y !=(double)0.0){
-            Imgproc.putText(temp, "Index", index,
-                    Core.FONT_HERSHEY_COMPLEX_SMALL, 3, new Scalar(0, 0, 0), 2);
-            Imgproc.circle(temp, index, 10, new Scalar(0, 0, 0), 4);
+            	Imgproc.putText(temp, "Index", index,Core.FONT_HERSHEY_COMPLEX_SMALL, 3, new Scalar(0, 0, 0), 2);//indicating index
+            	Imgproc.circle(temp, index, 10, new Scalar(0, 0, 0), 4);
             
             }
             
             
-            //double a=350.0, b=290.0, c=70.0, d=570.0, e=350.0, f=290.0;
+            
             if(fingerClicked==true&&index.x<470.0&&index.x>170.0&&index.y<100.0&&index.y>30.0){
             	
-            	//Imgproc.circle(VideoCapturer.webCamImage2, new org.opencv.core.Point(320, 60), 30, new Scalar(0, 255, 255), -1);
+            	
             	Imgproc.line(VideoCapturer.webCamImage, new org.opencv.core.Point(170, 60 ), new org.opencv.core.Point(470, 60), new Scalar(0, 255, 255), 3);
             	Imgproc.circle(VideoCapturer.webCamImage, new org.opencv.core.Point(index.x, 60), 30, new Scalar(0, 255, 255), -1);
             	volume = (index.x-170)*218.5;
-            	/*String command ="cmd /c nircmd.exe setvolume 0 "+a+" "+a;
-            	Runtime.getRuntime().exec(command);*/
+        
             	
-            	//this.addSlider1(new org.opencv.core.Point(320, 60));
+            	
             	VideoCapturer.button1Click=true;
             }
             else{
@@ -293,15 +223,13 @@ public class ImageProcessor {
             }
             
             if(fingerClicked==true&&index.x<470.0&&index.x>170.0&&index.y<180.0&&index.y>110.0){
-            	//this.addSlider2(new org.opencv.core.Point(320, 140));
+            	
             	Imgproc.line(VideoCapturer.webCamImage, new org.opencv.core.Point(170, 140 ), new org.opencv.core.Point(470, 140), new Scalar(0, 255, 255), 3);
             	Imgproc.circle(VideoCapturer.webCamImage, new org.opencv.core.Point(index.x, 140), 30, new Scalar(0, 255, 255), -1);
             	brightness = (index.x-170.0)/3;
-            	/*String command = "cmd /c nircmd.exe setbrightness "+a;
-            	Runtime.getRuntime().exec(command);*/
-            	
+            
             	VideoCapturer.button2Click=true;
-            	//Imgproc.circle(VideoCapturer.webCamImage2, new org.opencv.core.Point(320, 140), 30, new Scalar(0, 255, 255), -1);
+            	
             }
             else{
             	VideoCapturer.button2Click=false;
@@ -314,13 +242,4 @@ public class ImageProcessor {
         return temp;
 
     }
-    
-    
-    
-    
-    
-
-
-
-
 }
