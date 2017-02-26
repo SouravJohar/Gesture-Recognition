@@ -8,10 +8,10 @@ A simple program where you can use your hand to control the volume and the brigh
 Latest version of [JAVA](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 
 2.     
-OpenCV
+[OpenCV](http://opencv.org/downloads.html)
 
 3.     
-PowerShell
+[PowerShell](https://github.com/PowerShell/PowerShell)
 
 **Directions****:**
 
